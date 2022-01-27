@@ -6,8 +6,14 @@ import { AppComponent } from './app.component';
 
 import { BasicThreeJsComponent } from './basic/scene';
 
+import { AmbientLightComponent } from './lights/ambient.light';
+
 
 import { SphereGeometryComponent } from './geometries/sphere';
+import { BufferSquareGeometryComponent } from './geometries/buffer_square';
+import { BufferRingGeometryComponent } from './geometries/buffer_ring';
+import { TextureLoaderComponent } from './loaders/texture';
+
 
 import { GridHelperComponent } from './basic/grid_helper';
 import { OrbitControlsComponent } from './controller/orbitcontrol';
@@ -19,7 +25,12 @@ import { OrbitControlsComponent } from './controller/orbitcontrol';
     BasicThreeJsComponent,
     GridHelperComponent,
     OrbitControlsComponent,
-    SphereGeometryComponent
+    SphereGeometryComponent,
+    BufferSquareGeometryComponent,
+    BufferRingGeometryComponent,
+    TextureLoaderComponent,
+
+    AmbientLightComponent
   ],
   imports: [
     BrowserModule,

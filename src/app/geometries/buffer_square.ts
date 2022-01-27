@@ -7,7 +7,7 @@ import OrbitControls from '../controller/orbit.controls';
   templateUrl: '../basic/scene.html',
 })
 
-export class SphereGeometryComponent implements OnInit, OnDestroy, AfterViewInit { // , AfterViewInit
+export class BufferSquareGeometryComponent implements OnInit, OnDestroy, AfterViewInit { // , AfterViewInit
     @ViewChild('domContainer', {static: true}) domContainer!: ElementRef;
     private sceneWidth!: number;
     private sceneHeight!: number;
@@ -65,6 +65,8 @@ export class SphereGeometryComponent implements OnInit, OnDestroy, AfterViewInit
     private setScene() {
         this.scene = new THREE.Scene(); // the 3d scene
         this.scene.add( new THREE.AmbientLight( 0xAAAAAA ) );
+        // this.scene.add( new THREE.HemisphereLight( 0xAAAAAA ) );
+
     }
 
     // 카메라 관련 정의 시작
@@ -73,12 +75,12 @@ export class SphereGeometryComponent implements OnInit, OnDestroy, AfterViewInit
         const aspect = this.sceneWidth / this.sceneHeight;  // [Float] Camera frustum aspect ratio, usually the canvas width / canvas height. Default is 1 (square canvas).
 
         const near = 0.1; // [Float] Camera frustum near plane. Default is 0.1.
-        const far = 10000; // [Float]  Camera frustum far plane. Default is 2000.
+        const far = 20000; // [Float]  Camera frustum far plane. Default is 2000.
         this.camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
         this.camera.position.x = 0;
         this.camera.position.y = 0;
-        this.camera.position.z = 20; // 근/원 거리
-        this.camera.zoom = 10; // 근/원 거리
+        this.camera.position.z = 50; // 근/원 거리
+        this.camera.zoom = 100; // 근/원 거리
     }
 
     private setOrbitController() {
@@ -124,16 +126,69 @@ export class SphereGeometryComponent implements OnInit, OnDestroy, AfterViewInit
 
     private setMesh() {
         // 큐버를 만들고 scene에 추가한다.
-        const geometry = new THREE.SphereGeometry( 3, 32, 16 ); // radisu, widthSegments, heightSegment
-        const material = new THREE.MeshLambertMaterial( { color: 0xffff00 } );
+        const geometry = this.SquareGeometry( ); // radisu, widthSegments, heightSegment
+
+        const material = new THREE.MeshPhongMaterial( {  side: THREE.DoubleSide, vertexColors: true } );
+
         const sphere = new THREE.Mesh( geometry, material );
         this.scene.add( sphere );
     }
 
+    private SquareGeometry() {
+        const geometry = new THREE.BufferGeometry();
+        // const geometry = new THREE.Geometry();
+        // const geometry = new THREE.RingGeometry( 1, 5, 32 );
+        const indices = [];
+
+        const vertices = [];
+        const normals = [];
+        const colors = [];
+
+        const size = 20; // 전체 사각형의 크기
+        // const segments = 10;
+        const segments = 2; // 사각형을 분할할 갯수
+
+        const halfSize = size / 2;
+        const segmentSize = size / segments;
+
+
+        for ( let i = 0; i <= segments; i ++ ) {
+            const y = ( i * segmentSize ) - halfSize;
+            for ( let j = 0; j <= segments; j ++ ) {
+                const x = ( j * segmentSize ) - halfSize;
+                vertices.push( x, - y, 0 );
+                normals.push( 0, 0, 1 );
+                const r = ( x / size ) + 0.5;
+                const g = ( y / size ) + 0.5;
+                colors.push( r, g, 1 );
+            }
+        }
+
+        console.log('vertices:', vertices); // [-10, 10, 0, 10, 10, 0, -10, -10, 0, 10, -10, 0]
+        console.log('normals:', normals);
+
+        // generate indices (data for element array buffer)
+        for ( let i = 0; i < segments; i ++ ) {
+            for ( let j = 0; j < segments; j ++ ) {
+                const a = i * ( segments + 1 ) + ( j + 1 );
+                const b = i * ( segments + 1 ) + j;
+                const c = ( i + 1 ) * ( segments + 1 ) + j;
+                const d = ( i + 1 ) * ( segments + 1 ) + ( j + 1 );
+                // generate two faces (triangles) per iteration
+                indices.push( a, b, d ); // face one
+                indices.push( b, c, d ); // face two
+            }
+        }
+
+
+        geometry.setIndex( indices );
+        geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+        geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+        geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+        return geometry;
+    }
 
     private render() {
-
-
         this.renderer.render( this.scene, this.camera );
     }
 

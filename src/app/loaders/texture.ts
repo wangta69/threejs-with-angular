@@ -1,14 +1,13 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import * as THREE from 'three';
-import OrbitControls from './orbit.controls';
-
+import OrbitControls from '../controller/orbit.controls';
 
 @Component({
   selector: 'app-root',
   templateUrl: '../basic/scene.html',
 })
 
-export class OrbitControlsComponent implements OnInit, OnDestroy, AfterViewInit { // , AfterViewInit
+export class TextureLoaderComponent implements OnInit, OnDestroy, AfterViewInit { // , AfterViewInit
     @ViewChild('domContainer', {static: true}) domContainer!: ElementRef;
     private sceneWidth!: number;
     private sceneHeight!: number;
@@ -17,6 +16,7 @@ export class OrbitControlsComponent implements OnInit, OnDestroy, AfterViewInit 
     private camera!: THREE.PerspectiveCamera;
     private scene!: THREE.Scene;
     private controls: any;
+    private light!: any;
 
     constructor() {
     }
@@ -41,10 +41,14 @@ export class OrbitControlsComponent implements OnInit, OnDestroy, AfterViewInit 
         this.setRenderer(); // render 구성
         this.setScene(); // scene 구성
         this.setCamera(); // 카메라 설정
+        this.setMesh();
+        this.setLight(); //  조명 설정
 
         this.setOrbitController(); // controls 구
 
         this.setGridHelper();
+
+
 
         this.update(); // 화면을 계속해서 새로이 그린다.
     }
@@ -87,21 +91,51 @@ export class OrbitControlsComponent implements OnInit, OnDestroy, AfterViewInit 
         this.controls.zoomSpeed = 0.5;
     }
 
-
-
     private setGridHelper() {
         const helper = new THREE.GridHelper( 1000, 40, 0x303030, 0x303030 );
         helper.position.y = -75;
         this.scene.add( helper );
     }
 
+    private setLight() {
+        // this.light = new THREE.AmbientLight( 0x404040 ); // soft white light
+        this.light = new THREE.DirectionalLight( 0xdfebff, 1.75);
+        this.light.position.set(300, 400, 50);
+        this.light.position.multiplyScalar(1.3);
+
+        this.light.castShadow = true;
+        this.light.shadowCameraVisible = true;
+
+        this.light.shadowMapWidth = 512;
+        this.light.shadowMapHeight = 512;
+
+        const d = 200;
+
+        this.light.shadowCameraLeft = -d;
+        this.light.shadowCameraRight = d;
+        this.light.shadowCameraTop = d;
+        this.light.shadowCameraBottom = -d;
+
+        this.light.shadowCameraFar = 1000;
+        this.light.shadowDarkness = 0.2;
+
+        this.scene.add( this.light );
+    }
+
+    private setMesh() {
+        // 큐버를 만들고 scene에 추가한다.
+        const texture = new THREE.TextureLoader().load( '../../assets/images/earth.jpg' );
+        const geometry = new THREE.SphereGeometry( 3, 32, 16 ); // radisu, widthSegments, heightSegment
+
+        const material = new THREE.MeshLambertMaterial( {  map: texture } );
+
+        const sphere = new THREE.Mesh( geometry, material );
+        this.scene.add( sphere );
+    }
+
 
     private render() {
-        // 큐버를 만들고 scene에 추가한다.
-        const geometry = new THREE.BoxGeometry();
-        const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-        const cube = new THREE.Mesh( geometry, material );
-        this.scene.add( cube );
+
 
         this.renderer.render( this.scene, this.camera );
     }
