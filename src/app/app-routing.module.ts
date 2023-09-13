@@ -11,15 +11,15 @@ import { TextureLoaderComponent } from './loaders/texture';
 
 const routes: Routes = [
 
-    { path: 'basic', component: BasicThreeJsComponent },
-    { path: 'grid-helper', component: GridHelperComponent },
-    { path: 'controls/orbitControls', component: OrbitControlsComponent },
-    { path: 'geometries/sphere', component: SphereGeometryComponent },
-    { path: 'geometries/buffer-square', component: BufferSquareGeometryComponent },
-    { path: 'geometries/buffer-ring', component: BufferRingGeometryComponent },
-    { path: 'loader/texture', component: TextureLoaderComponent },
+  { path: 'basic', component: BasicThreeJsComponent },
+  { path: 'grid-helper', component: GridHelperComponent },
+  { path: 'controls/orbitControls', component: OrbitControlsComponent },
+  { path: 'geometries/sphere', component: SphereGeometryComponent },
+  { path: 'geometries/buffer-square', component: BufferSquareGeometryComponent },
+  { path: 'geometries/buffer-ring', component: BufferRingGeometryComponent },
+  { path: 'loader/texture', component: TextureLoaderComponent },
 
-    { path: 'lights/ambient', component: AmbientLightComponent },
+  { path: 'lights/ambient', component: AmbientLightComponent },
 ];
 
 @NgModule({

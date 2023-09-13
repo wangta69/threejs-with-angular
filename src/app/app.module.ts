@@ -17,6 +17,7 @@ import { TextureLoaderComponent } from './loaders/texture';
 
 import { GridHelperComponent } from './basic/grid_helper';
 import { OrbitControlsComponent } from './controller/orbitcontrol';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
 @NgModule({
@@ -34,7 +35,8 @@ import { OrbitControlsComponent } from './controller/orbitcontrol';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

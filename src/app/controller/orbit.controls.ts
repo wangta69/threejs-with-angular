@@ -10,244 +10,244 @@ import { Vector3, MOUSE, Quaternion, Spherical, Vector2, EventDispatcher } from 
 
 class OrbitControls extends EventDispatcher {
 
-    private object: any;
-    private domElement: any;
-    private enabled: boolean;
-    private target: Vector3;
-    private target0: any;
-    public minDistance: number;
-    public maxDistance: number;
-    private minZoom: number;
-    private maxZoom: number;
-    private minPolarAngle: number;
-    public maxPolarAngle: number;
-    private minAzimuthAngle: number;
-    private maxAzimuthAngle: number;
-    public enableDamping: boolean;
-    public dampingFactor: number;
-    private enableZoom: boolean;
-    public zoomSpeed: number;
-    private enableRotate: boolean;
-    private rotateSpeed: number;
-    private enablePan: boolean;
-    private keyPanSpeed: number;
-    private autoRotate: boolean;
-    private autoRotateSpeed: number;
-    private enableKeys: boolean;
-    private keys: any;
-    private mouseButtons: any;
+  private object: any;
+  private domElement: any;
+  private enabled: boolean;
+  private target: Vector3;
+  private target0: any;
+  public minDistance: number;
+  public maxDistance: number;
+  private minZoom: number;
+  private maxZoom: number;
+  private minPolarAngle: number;
+  public maxPolarAngle: number;
+  private minAzimuthAngle: number;
+  private maxAzimuthAngle: number;
+  public enableDamping: boolean;
+  public dampingFactor: number;
+  private enableZoom: boolean;
+  public zoomSpeed: number;
+  private enableRotate: boolean;
+  private rotateSpeed: number;
+  private enablePan: boolean;
+  private keyPanSpeed: number;
+  private autoRotate: boolean;
+  private autoRotateSpeed: number;
+  private enableKeys: boolean;
+  private keys: any;
+  private mouseButtons: any;
 
 
-    private position0: any;
-    private zoom0: any;
+  private position0: any;
+  private zoom0: any;
 
 
-    private getPolarAngle: any;
-    private getAzimuthalAngle: any;
-    private reset: any;
-    private update: any;
-    private dispose: any;
+  private getPolarAngle: any;
+  private getAzimuthalAngle: any;
+  private reset: any;
+  private update: any;
+  private dispose: any;
 
 
 
-    constructor (object: any, domElement: any) {
-        super();
+  constructor (object: any, domElement: any) {
+      super();
 
-        this.object = object;
+      this.object = object;
 
-        this.domElement = (domElement !== undefined) ? domElement : document;
+      this.domElement = (domElement !== undefined) ? domElement : document;
 
-        // Set to false to disable this control
-        this.enabled = true;
+      // Set to false to disable this control
+      this.enabled = true;
 
-        // "target" sets the location of focus, where the object orbits around
-        this.target = new Vector3();
+      // "target" sets the location of focus, where the object orbits around
+      this.target = new Vector3();
 
-        // How far you can dolly in and out ( PerspectiveCamera only )
-        this.minDistance = 0;
-        this.maxDistance = Infinity;
+      // How far you can dolly in and out ( PerspectiveCamera only )
+      this.minDistance = 0;
+      this.maxDistance = Infinity;
 
-        // How far you can zoom in and out ( OrthographicCamera only )
-        this.minZoom = 0;
-        this.maxZoom = Infinity;
+      // How far you can zoom in and out ( OrthographicCamera only )
+      this.minZoom = 0;
+      this.maxZoom = Infinity;
 
-        // How far you can orbit vertically, upper and lower limits.
-        // Range is 0 to Math.PI radians.
-        this.minPolarAngle = 0; // radians
-        this.maxPolarAngle = Math.PI; // radians
+      // How far you can orbit vertically, upper and lower limits.
+      // Range is 0 to Math.PI radians.
+      this.minPolarAngle = 0; // radians
+      this.maxPolarAngle = Math.PI; // radians
 
-        // How far you can orbit horizontally, upper and lower limits.
-        // If set, must be a sub-interval of the interval [ - Math.PI, Math.PI ].
-        this.minAzimuthAngle = -Infinity; // radians
-        this.maxAzimuthAngle = Infinity; // radians
+      // How far you can orbit horizontally, upper and lower limits.
+      // If set, must be a sub-interval of the interval [ - Math.PI, Math.PI ].
+      this.minAzimuthAngle = -Infinity; // radians
+      this.maxAzimuthAngle = Infinity; // radians
 
-        // Set to true to enable damping (inertia)
-        // If damping is enabled, you must call controls.update() in your animation loop
-        this.enableDamping = false;
-        this.dampingFactor = 0.25;
+      // Set to true to enable damping (inertia)
+      // If damping is enabled, you must call controls.update() in your animation loop
+      this.enableDamping = false;
+      this.dampingFactor = 0.25;
 
-        // This option actually enables dollying in and out; left as "zoom" for backwards compatibility.
-        // Set to false to disable zooming
-        this.enableZoom = true;
-        this.zoomSpeed = 1.0;
+      // This option actually enables dollying in and out; left as "zoom" for backwards compatibility.
+      // Set to false to disable zooming
+      this.enableZoom = true;
+      this.zoomSpeed = 1.0;
 
-        // Set to false to disable rotating
-        this.enableRotate = true;
-        this.rotateSpeed = 1.0;
+      // Set to false to disable rotating
+      this.enableRotate = true;
+      this.rotateSpeed = 1.0;
 
-        // Set to false to disable panning
-        this.enablePan = true;
-        this.keyPanSpeed = 7.0; // pixels moved per arrow key push
+      // Set to false to disable panning
+      this.enablePan = true;
+      this.keyPanSpeed = 7.0; // pixels moved per arrow key push
 
-        // Set to true to automatically rotate around the target
-        // If auto-rotate is enabled, you must call controls.update() in your animation loop
-        this.autoRotate = false;
-        this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
+      // Set to true to automatically rotate around the target
+      // If auto-rotate is enabled, you must call controls.update() in your animation loop
+      this.autoRotate = false;
+      this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
 
-        // Set to false to disable use of the keys
-        this.enableKeys = true;
+      // Set to false to disable use of the keys
+      this.enableKeys = true;
 
-        // The four arrow keys
-        this.keys = {
-          LEFT: 37,
-          UP: 38,
-          RIGHT: 39,
-          BOTTOM: 40
-        };
+      // The four arrow keys
+      this.keys = {
+        LEFT: 37,
+        UP: 38,
+        RIGHT: 39,
+        BOTTOM: 40
+      };
 
-        // Mouse buttons
-        this.mouseButtons = {
-          ORBIT: MOUSE.LEFT,
-          ZOOM: MOUSE.MIDDLE,
-          PAN: MOUSE.RIGHT
-        };
+      // Mouse buttons
+      this.mouseButtons = {
+        ORBIT: MOUSE.LEFT,
+        ZOOM: MOUSE.MIDDLE,
+        PAN: MOUSE.RIGHT
+      };
 
-        // for reset
-        this.target0 = this.target.clone();
-        this.position0 = this.object.position.clone();
-        this.zoom0 = this.object.zoom;
+      // for reset
+      this.target0 = this.target.clone();
+      this.position0 = this.object.position.clone();
+      this.zoom0 = this.object.zoom;
 
-        //
-        // public methods
-        //
+      //
+      // public methods
+      //
 
-        this.getPolarAngle = () => spherical.phi;
+      this.getPolarAngle = () => spherical.phi;
 
-        this.getAzimuthalAngle = () => spherical.theta;
+      this.getAzimuthalAngle = () => spherical.theta;
 
-        this.reset = function () {
-            scope.target.copy(scope.target0);
-            scope.object.position.copy(scope.position0);
-            scope.object.zoom = scope.zoom0;
+      this.reset = function () {
+          scope.target.copy(scope.target0);
+          scope.object.position.copy(scope.position0);
+          scope.object.zoom = scope.zoom0;
 
-            scope.object.updateProjectionMatrix();
-            scope.dispatchEvent(changeEvent);
+          scope.object.updateProjectionMatrix();
+          // scope.dispatchEvent(changeEvent);
 
-            scope.update();
+          scope.update();
 
-            state = STATE.NONE;
-        };
+          state = STATE.NONE;
+      };
 
-    // this method is exposed, but perhaps it would be better if we can make it private...
-    this.update = (function () {
-      var offset = new Vector3();
+  // this method is exposed, but perhaps it would be better if we can make it private...
+  this.update = (function () {
+    var offset = new Vector3();
 
-      // so camera.up is the orbit axis
-      var quat = new Quaternion().setFromUnitVectors(object.up, new Vector3(0, 1, 0));
-      var quatInverse = quat.clone().inverse();
+    // so camera.up is the orbit axis
+    var quat = new Quaternion().setFromUnitVectors(object.up, new Vector3(0, 1, 0));
+    // var quatInverse = quat.clone().inverse();
 
-      var lastPosition = new Vector3();
-      var lastQuaternion = new Quaternion();
+    var lastPosition = new Vector3();
+    var lastQuaternion = new Quaternion();
 
-      return function update () {
-        var position = scope.object.position;
+    return function update () {
+      var position = scope.object.position;
 
-        offset.copy(position).sub(scope.target);
+      offset.copy(position).sub(scope.target);
 
-        // rotate offset to "y-axis-is-up" space
-        offset.applyQuaternion(quat);
+      // rotate offset to "y-axis-is-up" space
+      offset.applyQuaternion(quat);
 
-        // angle from z-axis around y-axis
-        spherical.setFromVector3(offset);
+      // angle from z-axis around y-axis
+      spherical.setFromVector3(offset);
 
-        if (scope.autoRotate && state === STATE.NONE) {
-          rotateLeft(getAutoRotationAngle());
-        }
-
-        spherical.theta += sphericalDelta.theta;
-        spherical.phi += sphericalDelta.phi;
-
-        // restrict theta to be between desired limits
-        spherical.theta = Math.max(scope.minAzimuthAngle, Math.min(scope.maxAzimuthAngle, spherical.theta));
-
-        // restrict phi to be between desired limits
-        spherical.phi = Math.max(scope.minPolarAngle, Math.min(scope.maxPolarAngle, spherical.phi));
-
-        spherical.makeSafe();
-
-        spherical.radius *= scale;
-
-        // restrict radius to be between desired limits
-        spherical.radius = Math.max(scope.minDistance, Math.min(scope.maxDistance, spherical.radius));
-
-        // move target to panned location
-        scope.target.add(panOffset);
-
-        offset.setFromSpherical(spherical);
-
-        // rotate offset back to "camera-up-vector-is-up" space
-        offset.applyQuaternion(quatInverse);
-
-        position.copy(scope.target).add(offset);
-
-        scope.object.lookAt(scope.target);
-
-        if (scope.enableDamping === true) {
-          sphericalDelta.theta *= (1 - scope.dampingFactor);
-          sphericalDelta.phi *= (1 - scope.dampingFactor);
-        } else {
-          sphericalDelta.set(0, 0, 0);
-        }
-
-        scale = 1;
-        panOffset.set(0, 0, 0);
-
-        // update condition is:
-        // min(camera displacement, camera rotation in radians)^2 > EPS
-        // using small-angle approximation cos(x/2) = 1 - x^2 / 8
-
-        if (zoomChanged ||
-          lastPosition.distanceToSquared(scope.object.position) > EPS ||
-          8 * (1 - lastQuaternion.dot(scope.object.quaternion)) > EPS) {
-          scope.dispatchEvent(changeEvent);
-
-          lastPosition.copy(scope.object.position);
-          lastQuaternion.copy(scope.object.quaternion);
-          zoomChanged = false;
-
-          return true
-        }
-
-        return false
+      if (scope.autoRotate && state === STATE.NONE) {
+        rotateLeft(getAutoRotationAngle());
       }
-    }());
 
-    this.dispose = function () {
-      scope.domElement.removeEventListener('contextmenu', onContextMenu, false);
-      scope.domElement.removeEventListener('mousedown', onMouseDown, false);
-      scope.domElement.removeEventListener('wheel', onMouseWheel, false);
+      spherical.theta += sphericalDelta.theta;
+      spherical.phi += sphericalDelta.phi;
 
-      scope.domElement.removeEventListener('touchstart', onTouchStart, false);
-      scope.domElement.removeEventListener('touchend', onTouchEnd, false);
-      scope.domElement.removeEventListener('touchmove', onTouchMove, false);
+      // restrict theta to be between desired limits
+      spherical.theta = Math.max(scope.minAzimuthAngle, Math.min(scope.maxAzimuthAngle, spherical.theta));
 
-      document.removeEventListener('mousemove', onMouseMove, false);
-      document.removeEventListener('mouseup', onMouseUp, false);
+      // restrict phi to be between desired limits
+      spherical.phi = Math.max(scope.minPolarAngle, Math.min(scope.maxPolarAngle, spherical.phi));
 
-      window.removeEventListener('keydown', onKeyDown, false);
+      spherical.makeSafe();
 
-      // scope.dispatchEvent( { type: 'dispose' } ); // should this be added here?
-    };
+      spherical.radius *= scale;
+
+      // restrict radius to be between desired limits
+      spherical.radius = Math.max(scope.minDistance, Math.min(scope.maxDistance, spherical.radius));
+
+      // move target to panned location
+      scope.target.add(panOffset);
+
+      offset.setFromSpherical(spherical);
+
+      // rotate offset back to "camera-up-vector-is-up" space
+      // offset.applyQuaternion(quatInverse);
+
+      position.copy(scope.target).add(offset);
+
+      scope.object.lookAt(scope.target);
+
+      if (scope.enableDamping === true) {
+        sphericalDelta.theta *= (1 - scope.dampingFactor);
+        sphericalDelta.phi *= (1 - scope.dampingFactor);
+      } else {
+        sphericalDelta.set(0, 0, 0);
+      }
+
+      scale = 1;
+      panOffset.set(0, 0, 0);
+
+      // update condition is:
+      // min(camera displacement, camera rotation in radians)^2 > EPS
+      // using small-angle approximation cos(x/2) = 1 - x^2 / 8
+
+      if (zoomChanged ||
+        lastPosition.distanceToSquared(scope.object.position) > EPS ||
+        8 * (1 - lastQuaternion.dot(scope.object.quaternion)) > EPS) {
+        // scope.dispatchEvent(changeEvent);
+
+        lastPosition.copy(scope.object.position);
+        lastQuaternion.copy(scope.object.quaternion);
+        zoomChanged = false;
+
+        return true
+      }
+
+      return false
+    }
+  }());
+
+  this.dispose = function () {
+    scope.domElement.removeEventListener('contextmenu', onContextMenu, false);
+    scope.domElement.removeEventListener('mousedown', onMouseDown, false);
+    scope.domElement.removeEventListener('wheel', onMouseWheel, false);
+
+    scope.domElement.removeEventListener('touchstart', onTouchStart, false);
+    scope.domElement.removeEventListener('touchend', onTouchEnd, false);
+    scope.domElement.removeEventListener('touchmove', onTouchMove, false);
+
+    document.removeEventListener('mousemove', onMouseMove, false);
+    document.removeEventListener('mouseup', onMouseUp, false);
+
+    window.removeEventListener('keydown', onKeyDown, false);
+
+    // scope.dispatchEvent( { type: 'dispose' } ); // should this be added here?
+  };
 
     //
     // internals
@@ -617,7 +617,7 @@ class OrbitControls extends EventDispatcher {
         document.addEventListener('mousemove', onMouseMove, false);
         document.addEventListener('mouseup', onMouseUp, false);
 
-        scope.dispatchEvent(startEvent);
+        // scope.dispatchEvent(startEvent);
       }
     }
 
@@ -647,7 +647,7 @@ class OrbitControls extends EventDispatcher {
       document.removeEventListener('mousemove', onMouseMove, false);
       document.removeEventListener('mouseup', onMouseUp, false);
 
-      scope.dispatchEvent(endEvent);
+      // scope.dispatchEvent(endEvent);
 
       state = STATE.NONE;
     }
@@ -660,8 +660,8 @@ class OrbitControls extends EventDispatcher {
 
       handleMouseWheel(event);
 
-      scope.dispatchEvent(startEvent); // not sure why these are here...
-      scope.dispatchEvent(endEvent);
+      // scope.dispatchEvent(startEvent); // not sure why these are here...
+      // scope.dispatchEvent(endEvent);
     }
 
     function onKeyDown (event: any) {
@@ -710,7 +710,7 @@ class OrbitControls extends EventDispatcher {
       }
 
       if (state !== STATE.NONE) {
-        scope.dispatchEvent(startEvent);
+        // scope.dispatchEvent(startEvent);
       }
     }
 
@@ -757,7 +757,7 @@ class OrbitControls extends EventDispatcher {
     function onTouchEnd (event: any) {
       if (scope.enabled === false) return
 
-      scope.dispatchEvent(endEvent);
+      // scope.dispatchEvent(endEvent);
 
       state = STATE.NONE;
     }
