@@ -1,11 +1,23 @@
-<a href="/basic">[기초]</a>
-<a href="/grid-helper">[grid-helper]</a>
-<a href="/controls/orbitControls">[Orbit Controls]</a>
-<a href="/geometries/sphere">[Sphere Geometry]</a>
-<a href="/geometries/buffer-square">[Buffer Geometry(square)]</a>
-<a href="/geometries/buffer-ring">[Buffer Geometry(ring)]</a>
-<a href="/lights/ambient">[Ambient Lights]</a>
-<a href="/loader/texture">[Texture Loader]</a>
-<a href="/loader/ring">[Texture Ring]</a>
 
-<router-outlet></router-outlet>
+<div class="layout">
+  <div>
+    <ul>
+      <li><a routerLink="/basic">[기초]</a></li>
+      <li><a routerLink="/grid-helper">[grid-helper]</a></li>
+      <li><a routerLink="/controls/orbitControls">[Orbit Controls]</a></li>
+      <li><a routerLink="/geometries/sphere">[Sphere Geometry]</a></li>
+      <li><a routerLink="/geometries/buffer-square">[Buffer Geometry(square)]</a></li>
+      <li><a routerLink="/geometries/buffer-ring">[Buffer Geometry(ring)]</a></li>
+      <li><a routerLink="/lights/ambient">[Ambient Lights]</a></li>
+      <li><a routerLink="/loader/texture">[Texture Loader]</a></li>
+      <li><a routerLink="/loader/ring">[Texture Ring]</a></li>
+      <li><a routerLink="/camera/basic">[Camera - Fov, Near, Far]</a></li>
+    </ul>
+  </div>
+  <div>
+    <router-outlet></router-outlet>
+  </div>
+</div>
+
+
+

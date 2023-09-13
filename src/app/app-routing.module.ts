@@ -8,6 +8,7 @@ import { BufferSquareGeometryComponent } from './geometries/buffer_square';
 import { BufferRingGeometryComponent } from './geometries/buffer_ring';
 import { AmbientLightComponent } from './lights/ambient.light';
 import { TextureLoaderComponent } from './loaders/texture';
+import { CameraBasicComponent } from './camera/basic';
 
 const routes: Routes = [
 
@@ -20,6 +21,8 @@ const routes: Routes = [
   { path: 'loader/texture', component: TextureLoaderComponent },
 
   { path: 'lights/ambient', component: AmbientLightComponent },
+
+  { path: 'camera/basic', component: CameraBasicComponent },
 ];
 
 @NgModule({

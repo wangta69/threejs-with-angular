@@ -1,0 +1,145 @@
+
+
+<div>
+  <div #domContainer class="domContainer" style="width: 500px; height: 500px;" ></div>
+
+  <div class="controller">
+    <ul>
+      <li>
+        <span>
+          fov
+        </span>
+        <span>
+          <mat-slider
+            [disabled]="sliderFov.disabled"
+            [max]="sliderFov.max"
+            [min]="sliderFov.min"
+            [step]="sliderFov.step"
+            [discrete]="sliderFov.thumbLabel"
+            [showTickMarks]="sliderFov.showTicks"
+            (input)="InputFov($event)"
+          >
+          <input matSliderThumb [(ngModel)]="sliderFov.value">
+          </mat-slider>
+        </span>
+      </li>
+      <li>
+        <span>
+          Near
+        </span>
+        <span>
+          <mat-slider
+            [disabled]="sliderNear.disabled"
+            [max]="sliderNear.max"
+            [min]="sliderNear.min"
+            [step]="sliderNear.step"
+            [discrete]="sliderNear.thumbLabel"
+            [showTickMarks]="sliderNear.showTicks"
+            (input)="InputNear($event)"
+          >
+          <input matSliderThumb [(ngModel)]="sliderNear.value">
+          </mat-slider>
+        </span>
+      </li>
+      <li>
+        <span>
+          Far
+        </span>
+        <span>
+          <mat-slider
+            [disabled]="sliderFar.disabled"
+            [max]="sliderFar.max"
+            [min]="sliderFar.min"
+            [step]="sliderFar.step"
+            [discrete]="sliderFar.thumbLabel"
+            [showTickMarks]="sliderFar.showTicks"
+            (input)="InputFar($event)"
+          >
+          <input matSliderThumb [(ngModel)]="sliderFar.value">
+          </mat-slider>
+        </span>
+      </li>
+      <li>
+        <span>
+          Position X
+        </span>
+        <span>
+          <mat-slider
+            [disabled]="sliderPositionX.disabled"
+            [max]="sliderPositionX.max"
+            [min]="sliderPositionX.min"
+            [step]="sliderPositionX.step"
+            [discrete]="sliderPositionX.thumbLabel"
+            [showTickMarks]="sliderPositionX.showTicks"
+            (input)="InputPositionX($event)"
+          >
+          <input matSliderThumb [(ngModel)]="sliderPositionX.value">
+          </mat-slider>
+        </span>
+      </li>
+      <li>
+        <span>
+          Position Y
+        </span>
+        <span>
+          <mat-slider
+            [disabled]="sliderPositionY.disabled"
+            [max]="sliderPositionY.max"
+            [min]="sliderPositionY.min"
+            [step]="sliderPositionY.step"
+            [discrete]="sliderPositionY.thumbLabel"
+            [showTickMarks]="sliderPositionY.showTicks"
+            (input)="InputPositionY($event)"
+          >
+          <input matSliderThumb [(ngModel)]="sliderPositionY.value">
+          </mat-slider>
+        </span>
+      </li>
+      <li>
+        <span>
+          Position Z
+        </span>
+        <span>
+          <mat-slider
+            [disabled]="sliderPositionZ.disabled"
+            [max]="sliderPositionZ.max"
+            [min]="sliderPositionZ.min"
+            [step]="sliderPositionZ.step"
+            [discrete]="sliderPositionZ.thumbLabel"
+            [showTickMarks]="sliderPositionZ.showTicks"
+            (input)="InputPositionZ($event)"
+          >
+          <input matSliderThumb [(ngModel)]="sliderPositionZ.value">
+          </mat-slider>
+        </span>
+      </li>
+      <li>
+        <span>
+          Zoom
+        </span>
+        <span>
+          <mat-slider
+            [disabled]="sliderZoom.disabled"
+            [max]="sliderZoom.max"
+            [min]="sliderZoom.min"
+            [step]="sliderZoom.step"
+            [discrete]="sliderZoom.thumbLabel"
+            [showTickMarks]="sliderZoom.showTicks"
+            (input)="InputZoom($event)"
+          >
+          <input matSliderThumb [(ngModel)]="sliderZoom.value">
+          </mat-slider>
+        </span>
+      </li>
+    </ul>
+  
+  </div>
+</div>
+
+
+
+
+<img src="assets/images/camera1.png">
+
+<p>fov(Field of View) : 카메라와 사물과의 거리이다. 0에 가까와 질수록 카케라와 사물간의 거리가 작아지고 사물이 크게 보인다. 0일 경우는 카메라와 사물이 동일 선상이므로 사물이 보이지 않는다.</p>
+<p>near와 far는 렌더링과 관련있다. near와 far사이에 존재하는 사물만을 렌더링한다. 따라서 near가 너무 크거나 far가 너무 작을 경우는 사물이 보이지 않는다.</p>

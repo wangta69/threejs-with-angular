@@ -1,8 +1,10 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
+import { FormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+
+import {MatSliderModule} from '@angular/material/slider';
 
 import { BasicThreeJsComponent } from './basic/scene';
 
@@ -14,6 +16,7 @@ import { BufferSquareGeometryComponent } from './geometries/buffer_square';
 import { BufferRingGeometryComponent } from './geometries/buffer_ring';
 import { TextureLoaderComponent } from './loaders/texture';
 
+import { CameraBasicComponent } from './camera/basic';
 
 import { GridHelperComponent } from './basic/grid_helper';
 import { OrbitControlsComponent } from './controller/orbitcontrol';
@@ -31,12 +34,16 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     BufferRingGeometryComponent,
     TextureLoaderComponent,
 
+    CameraBasicComponent,
+
     AmbientLightComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    FormsModule,
+    MatSliderModule
   ],
   providers: [],
   bootstrap: [AppComponent]
