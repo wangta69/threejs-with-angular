@@ -1,6 +1,6 @@
 
 
-<div>
+<div style="display: flex;">
   <div #domContainer class="domContainer" style="width: 500px; height: 500px;" ></div>
 
   <div class="controller">
@@ -115,7 +115,9 @@
       </li>
       <li>
         <span>
-          Zoom
+          Zoom (camera.fov = myFov / myZoom)
+          즉 zoom 이 크질 수록 혹은 fov 가 작아질수록 사물은 커 보인다. 
+          따라서 zoom은 1로 그대로 두고 fov만을 처리하는 것이 좋다.
         </span>
         <span>
           <mat-slider

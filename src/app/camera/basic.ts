@@ -79,12 +79,12 @@ export class CameraBasicComponent implements OnInit, OnDestroy, AfterViewInit { 
 
   public sliderZoom = {
     disabled: false,
-    max: 20000,
-    min:  -50,
+    max: 10,
+    min:  -10,
     showTicks: false,
     step: 0.1,
     thumbLabel: true,
-    value: 2000, // default
+    value: 1, // default
   }
 
   private cameraOption = {
@@ -100,7 +100,7 @@ export class CameraBasicComponent implements OnInit, OnDestroy, AfterViewInit { 
     z: 20,
   }
 
-  private cameraZoom = 10;
+  private cameraZoom = 1;
 
   
   constructor() {}
@@ -164,6 +164,8 @@ export class CameraBasicComponent implements OnInit, OnDestroy, AfterViewInit { 
     this.camera.position.y = this.cameraPosition.y;
     this.camera.position.z = this.cameraPosition.z; // 근/원 거리
     this.camera.zoom = this.cameraZoom; // 근/원 거리
+    console.log('this.camera.zoom>>', this.camera.zoom);
+    this.camera.updateProjectionMatrix(); // zoom 이 변경될때는 반드시 이 것을 해주어야 zoom이 적용된다.
   }
 
 
@@ -218,6 +220,7 @@ export class CameraBasicComponent implements OnInit, OnDestroy, AfterViewInit { 
 
   public InputZoom(e: any) {
     this.cameraZoom = parseFloat(e.target.value);
+
     this.setCamera();
   }
 
