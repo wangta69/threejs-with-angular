@@ -1,5 +1,5 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { Routes } from '@angular/router';
+
 import { BasicThreeJsComponent } from './basic/scene';
 import { GridHelperComponent } from './basic/grid_helper';
 import { OrbitControlsComponent } from './controller/orbitcontrol';
@@ -10,8 +10,7 @@ import { AmbientLightComponent } from './lights/ambient.light';
 import { TextureLoaderComponent } from './loaders/texture';
 import { CameraBasicComponent } from './camera/basic';
 
-const routes: Routes = [
-
+export const routes: Routes = [
   { path: 'basic', component: BasicThreeJsComponent },
   { path: 'grid-helper', component: GridHelperComponent },
   { path: 'controls/orbitControls', component: OrbitControlsComponent },
@@ -24,9 +23,3 @@ const routes: Routes = [
 
   { path: 'camera/basic', component: CameraBasicComponent },
 ];
-
-@NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
-})
-export class AppRoutingModule { }

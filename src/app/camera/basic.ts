@@ -1,8 +1,13 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import {MatIconModule} from '@angular/material/icon';
+import {MatSliderModule} from '@angular/material/slider';
+
 import * as THREE from 'three';
 
 @Component({
   selector: 'app-root',
+  imports: [FormsModule, MatIconModule, MatSliderModule],
   templateUrl: 'basic.html',
 })
 
