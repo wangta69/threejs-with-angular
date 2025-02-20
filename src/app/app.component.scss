@@ -1,3 +1,9 @@
 .layout {
   display: flex;
+
+  .switch-absolute {
+    &.on{
+      position: absolute;
+    }
+  }
 }

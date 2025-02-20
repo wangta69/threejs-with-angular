@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {MatIconModule} from '@angular/material/icon';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import {MatSliderModule} from '@angular/material/slider';
 
 import * as THREE from 'three';
@@ -21,6 +22,9 @@ export class CameraBasicComponent implements OnInit, OnDestroy, AfterViewInit { 
   private renderer!: THREE.WebGLRenderer;
   private camera!: THREE.PerspectiveCamera;
   private scene!: THREE.Scene;
+
+ 
+  private controls!:OrbitControls;
 
   public sliderFov = {
     disabled: false,
@@ -129,7 +133,9 @@ export class CameraBasicComponent implements OnInit, OnDestroy, AfterViewInit { 
     this.setRenderer(); // render 구성
     this.setScene(); // scene 구성
     this.setCamera(); // 카메라 설정
-
+    this.setGridHelper();
+    this.setAxesHelper();
+    this.setOrbitController();
     this.update(); // 화면을 계속해서 새로이 그린다.
   }
 
@@ -173,6 +179,26 @@ export class CameraBasicComponent implements OnInit, OnDestroy, AfterViewInit { 
     this.camera.updateProjectionMatrix(); // zoom 이 변경될때는 반드시 이 것을 해주어야 zoom이 적용된다.
   }
 
+  private setGridHelper() {
+    const helper = new THREE.GridHelper( 1000, 40, 0x303030, 0x303030 );
+    helper.position.y = -75;
+    this.scene.add( helper );
+  }
+
+  private setAxesHelper() {
+    const axesHelper = new THREE.AxesHelper( 5 );
+    this.scene.add( axesHelper );
+  }
+
+  private setOrbitController() {
+    this.controls = new OrbitControls( this.camera, this.renderer.domElement );
+    this.controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+    this.controls.dampingFactor = 1;
+    this.controls.minDistance = 1;
+    this.controls.maxDistance = Infinity;
+    this.controls.maxPolarAngle = Math.PI / 2; //
+    this.controls.zoomSpeed = 0.5;
+}
 
   private render() {
     // 큐버를 만들고 scene에 추가한다.
@@ -181,6 +207,7 @@ export class CameraBasicComponent implements OnInit, OnDestroy, AfterViewInit { 
       color: 0x00ff00
     });
     const cube = new THREE.Mesh(geometry, material);
+    // cube.position.set(0, -1, 0);
     this.scene.add(cube);
 
     this.renderer.render(this.scene, this.camera);
