@@ -8,6 +8,8 @@ import { BufferSquareGeometryComponent } from './geometries/buffer_square';
 import { BufferRingGeometryComponent } from './geometries/buffer_ring';
 import { AmbientLightComponent } from './lights/ambient.light';
 import { TextureLoaderComponent } from './loaders/texture';
+import { GlftLoaderComponent } from './loaders/gltf';
+
 import { CameraBasicComponent } from './camera/basic';
 // import { CubeComponent } from './example/cube/cube-rotate';
 import { CubeComponent } from './example/cube/cube3_3_event_each';
@@ -23,7 +25,7 @@ export const routes: Routes = [
   { path: 'geometries/buffer-square', component: BufferSquareGeometryComponent },
   { path: 'geometries/buffer-ring', component: BufferRingGeometryComponent },
   { path: 'loader/texture', component: TextureLoaderComponent },
-
+  { path: 'loader/gltf', component: GlftLoaderComponent },
   { path: 'lights/ambient', component: AmbientLightComponent },
 
   { path: 'camera/basic', component: CameraBasicComponent },
