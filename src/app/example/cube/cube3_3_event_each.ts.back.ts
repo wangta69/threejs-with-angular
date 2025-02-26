@@ -34,7 +34,6 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
 
   private renderer!: THREE.WebGLRenderer;
   private camera!: THREE.PerspectiveCamera;
-  // private camera!: THREE.OrthographicCamera;
   private scene!: THREE.Scene;
   private controls: any;
   private cubes = new THREE.Group();
@@ -225,35 +224,34 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
     this.plane = new THREE.Mesh(
       // new THREE.PlaneBufferGeometry( 200, 200 ),
       // new THREE.PlaneGeometry( 200, 200 ),
-      new THREE.PlaneGeometry(10, 10),
+      new THREE.PlaneGeometry(200, 200),
       helperMaterial.clone()
     );
 
-    this.plane.position.set( 0, 0, 0 );
-    this.plane.rotation.set( 0, Math.PI/4, 0 ); // Math.PI  = 3.14 radian = 180도
-
     this.scene.add(this.plane);
-    
 
     // 회전을 계산하기위해 임의 boundry를 만들어 둔다.
     this.boundry = new THREE.Mesh(
       // new THREE.BoxBufferGeometry( 1, 1, 1 ),
       new THREE.BoxGeometry( 3, 3, 3),
       new THREE.MeshBasicMaterial( { depthWrite: false, transparent: false, opacity: 1, color: 0x0033ff } )
+      // helperMaterial.clone(),
     );
     this.scene.add(this.boundry);
     this.scene.add(this.cubes);
-    this.cubes.add(this.layerGroup);
+    // this.scene.add(this.layerGroup);
   }
 
   private createCube() {
     this.createHelper();
 
     const pieceSize = 1;
+    // const colors = ['#003092', '#E07A5F', '#D91656', '#E52020', '#F5F5F5', '#000000'];
+
     
     const geometry = new THREE.BoxGeometry( pieceSize, pieceSize, pieceSize ); // width, height, depth
-    const material = new THREE.MeshBasicMaterial( {color: 0x000000} ); 
-    // const material = new THREE.MeshPhongMaterial( {color: 0x000000} ); 
+    // const material = new THREE.MeshBasicMaterial( {color: 0x000000} ); 
+    const material = new THREE.MeshPhongMaterial( {color: 0x000000} ); 
     const pieceMesh = new THREE.Mesh( geometry, material ); 
 
     this.positions.forEach((position: any, index) =>{
@@ -263,17 +261,20 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
 
       piece.add(pieceCube);
       piece.name = index;
-
+      // pieceCube.material.setPosition(position.posions);
+      // pieceCube.position.set(position.x, position.y, position.z);
+      // pieceCube.position.set(0, 0, position.z);
+      // piece.position.set(0, 0, position.z);
       piece.position.set(position.x, position.y, position.z);
       const edgeGeometry:THREE.ExtrudeGeometry = this.depthedPlaneGeometry(
         pieceSize,
         0.01
       );
   
-      const mainMaterial = new THREE.MeshLambertMaterial();
+      // const mainMaterial = new THREE.MeshLambertMaterial();
       // const mainMaterial = new THREE.MeshLambertMaterial({wireframe:true});
       
-      // const mainMaterial = new THREE.MeshPhongMaterial({wireframe:true}); 
+      const mainMaterial = new THREE.MeshPhongMaterial({wireframe:true}); 
       const distance = pieceSize / 2;
       const  cubeposions = [ 'L', 'R', 'D', 'U', 'B', 'F' ];
 
@@ -339,92 +340,99 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
     if ( this.state !== STILL) return;
 
     // Raycaster 를 이용하여 현재 마우스 좌표값을 plane내의 좌표값으로 변경
-   
+    const planeIntersect = this.getIntersect( position.current, this.plane, false);
+    if(!planeIntersect) return;
 
     const boundryIntersect: any = this.getIntersect( position.current, this.boundry, false );
     if(boundryIntersect) {
-      this.flipType = 'layer';
       this.dragIntersect = this.getIntersect( position.current, this.cubes.children, true );
       this.dragNormal = boundryIntersect.face.normal.round();
-
-      this.plane.rotation.set( 0, 0, 0 );
-      this.plane.position.set( 0, 0, 0 );
-      this.plane.lookAt( this.dragNormal );
-      
-      this.plane.applyMatrix4( this.boundry.matrixWorld );
-
-      this.plane.updateMatrixWorld();
-      
+      console.log('boundryIntersect:', boundryIntersect);
+      console.log('this.dragNormal:', this.dragNormal);
+      this.flipType = 'layer';
     } else {
       this.flipType = 'cube';
-
-      this.dragNormal = new THREE.Vector3( 0, 0, 1 );
-      this.plane.position.set( 0, 0, 0 );
-      this.plane.rotation.set( 0, Math.PI/4, 0 ); // Math.PI  = 3.14 radian = 180도
     }
 
-    const planeIntersect: any = this.getIntersect( position.current, this.plane, false);
-    if(!planeIntersect){
-      console.error('planeIntersect not exist');
-      return;
-    }
-    this.plane.updateMatrixWorld();
+
     // 월드좌표값을 this.plane내의 좌표 값으로 변경
-    // // 변경된 다시한번 더 구한다. planeIntersect를 구한다. 
     this.dragCurrent = this.plane.worldToLocal( planeIntersect.point );
     
     // 이동거리 초기화
     this.dragTotal = new THREE.Vector3();
+
+    // this.state = ( this.state === STILL ) ? PREPARING : this.state;
     this.state = PREPARING;
   }
 
   private onDragMove(position: any){
-
     const planeIntersect = this.getIntersect( position.current, this.plane, false);
     
     if(!planeIntersect) {
       console.error('planeIntersect not exist');
       return;
     }
-    const point = this.plane.worldToLocal( planeIntersect.point.clone() );
+
     
-    this.dragDelta = point.clone().sub( this.dragCurrent ).setZ( 0 );
+
+    let point;
+    switch(this.flipType) {
+      case 'layer':
+        const boundryIntersect: any = this.getIntersect( position.current, this.boundry, false );
+        point = this.boundry.worldToLocal( boundryIntersect.point.clone() );
+        this.dragDelta = point.clone().sub( this.dragCurrent ).setZ( 0 );
+        this.dragTotal.add( this.dragDelta );
+        this.dragCurrent = point;
+        break;
+      case 'cube':
+        point = this.plane.worldToLocal( planeIntersect.point.clone() );
+        this.dragDelta = point.clone().sub( this.dragCurrent ).setZ( 0 );
+        this.dragTotal.add( this.dragDelta );
+        this.dragCurrent = point;
+        break;
+    }
+
     
-    this.dragTotal.add( this.dragDelta );
-    this.dragCurrent = point;
-    this.addMomentumPoint( this.dragDelta );
 
     
     if ( this.state === PREPARING  && this.dragTotal.length() > 0.1 ) { //
+
+
       this.dragDirection = this.getMainAxis( this.dragTotal );
-   
+      console.log('this.dragTotal:', this.dragTotal, 'this.dragDirection:',);
+      
       switch(this.flipType) {
         case 'layer':
-          // return;
           const direction:any = new THREE.Vector3();
           
           direction[ this.dragDirection ] = 1;
 
-          
           const worldDirection = this.plane.localToWorld( direction ).sub( this.plane.position );
-          const objectDirection = this.boundry.worldToLocal( worldDirection ).round();        
-          this.flipAxis = objectDirection.cross( this.dragNormal ).negate();
 
+          const objectDirection = this.boundry.worldToLocal( worldDirection ).round();
+ 
+          console.log('objectDirection:', this.deepcopy(objectDirection), ', dragNormal', this.deepcopy(this.dragNormal));
+        
+          this.flipAxis = objectDirection.cross( this.dragNormal ).negate();
+          console.log('objectDirection after:', this.deepcopy(objectDirection), this.flipAxis);
+          
           this.selectLayer( this.getLayer( false ) );
+          this.state = STILL;
           break;
         case 'cube':
           const axis = ( this.dragDirection != 'x' )
           ? ( ( this.dragDirection == 'y' && position.current.x > this.sceneWidth / 2 ) ? 'z' : 'x' )
           : 'y';
+    
           this.flipAxis = new THREE.Vector3();
-          this.flipAxis[ axis ] = 1 * ( ( axis == 'x' ) ? - 1 : 1 );      
+          this.flipAxis[ axis ] = 1 * ( ( axis == 'x' ) ? - 1 : 1 );
+    
+          this.flipAngle = 0;
+          this.state = ROTATING;
           break;
       }
-      this.flipAngle = 0;
-      this.state = ROTATING;
-     
     } else if ( this.state === ROTATING ) {
-      const rotation = this.dragDelta[ this.dragDirection ] * 0.2; // 이전 및 현재의 dragDelta 값을 구한다.
+      const rotation = this.dragDelta[ this.dragDirection ]; // 이전 및 현재의 dragDelta 값을 구한다.
       switch(this.flipType) {
         case 'layer':
           this.layerGroup.rotateOnAxis( this.flipAxis, rotation );
@@ -433,6 +441,8 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
         case 'cube':
           this.boundry.rotateOnWorldAxis( this.flipAxis, rotation ); //eges 및 cubes의 로테이션을 반영한다.
           this.cubes.rotation.copy( this.boundry.rotation );
+
+          // this.cubes.rotateOnWorldAxis( this.flipAxis, rotation );
           this.flipAngle += rotation; // 전체 rotaion의 값을 입력
           break;
       }
@@ -449,13 +459,8 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
     // state가 ROTATING 아니면 끝내고
     if ( this.state !== ROTATING ) {
       this.state = STILL;
-      
-      // for texgt
-    // this.boundry.quaternion.set(0, 0, 0, 1)
       return;
     }
-
-    
 
     // state 가 ROTATING 이면  ANIMATION으로 전환시켜 마무리 짓는다.
     this.state = ANIMATING;
@@ -468,18 +473,25 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
       : this.roundAngle( this.flipAngle );
 
     const delta = angle - this.flipAngle;
-    // const axis = ( this.dragDirection != 'x' )
-    // ? ( ( this.dragDirection == 'y' && position.current.x > this.sceneWidth / 2 ) ? 'z' : 'x' )
-    // : 'y';
+    const axis = ( this.dragDirection != 'x' )
+    ? ( ( this.dragDirection == 'y' && position.current.x > this.sceneWidth / 2 ) ? 'z' : 'x' )
+    : 'y';
 
     switch(this.flipType) {
       case 'layer':
         this.rotateLayer( delta, false, (layer: any) => {
-          this.state = STILL;
+
+          // this.game.storage.saveGame();
+          
+          // this.state = this.gettingDrag ? PREPARING : STILL;
+          // this.gettingDrag = false;
+
+          // this.checkIsSolved();
+
         } );
         break;
       case 'cube':
-        this.rotateCube( delta,  () => {
+        this.rotateCube( delta, axis, () => {
           this.state = STILL;
         });
         break;
@@ -501,8 +513,6 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
       onUpdate: () => {
 
         const delta = this.tween.rotate - this.tween.prerotate;
-        this.tween.prerotate = this.tween.rotate;
-
         let deltaAngle = delta * rotation;
         this.layerGroup.rotateOnAxis( this.flipAxis, deltaAngle );
         // bounce( tween.value, deltaAngle, rotation );
@@ -525,7 +535,7 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
 
   }
 
-  private rotateCube( rotation: number, callback:() => void) {
+  private rotateCube( rotation: number, axis: string, callback:() => void) {
     this.tween = {
       prerotate: 0,
       rotate: 0,
@@ -545,7 +555,7 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
       },
       onComplete: () => {
         // 값을 보정한다.
-        this.boundry.rotation.setFromVector3( this.snapRotation( new THREE.Vector3().setFromEuler(this.boundry.rotation) ) ); 
+        this.boundry.rotation.setFromVector3( this.snapRotation( new THREE.Vector3().setFromEuler(this.boundry.rotation) ) );        
         this.cubes.rotation.copy( this.boundry.rotation );
         callback();
       },
@@ -645,6 +655,7 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
       axis = this.getMainAxis( position );
     }
 
+    // this.game.cube.pieces.forEach( (piece: any) => {
     this.piecesObject.forEach( (piece: any) => {
       const piecePosition = piece.position.clone().multiplyScalar( scalar ).round();
       if ( piecePosition[ axis ] == position[ axis ] ) layer.push( piece.name );
@@ -704,13 +715,12 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
 
 
   private setCamera() {
-    const fov = 40; // [Float]  Camera frustum vertical field of view, from bottom to top of view, in degrees. Default is 50.
+    const fov = 20; // [Float]  Camera frustum vertical field of view, from bottom to top of view, in degrees. Default is 50.
    // const aspect = 1;  // [Float] Camera frustum aspect ratio, usually the canvas width / canvas height. Default is 1 (square canvas).
     const aspect = this.sceneWidth / this.sceneHeight;
     const near = 0.1; // [Float] Camera frustum near plane. Default is 0.1.
     const far = 10000; // [Float]  Camera frustum far plane. Default is 2000.
     this.camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-    // this.camera = new THREE.OrthographicCamera(-60, 60, 40, -40, near, far); // 
     this.camera.position.x = 10;
     this.camera.position.y = 10;
     this.camera.position.z = 10;

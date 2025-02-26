@@ -240,16 +240,19 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
       // new THREE.BoxBufferGeometry( 1, 1, 1 ),
       new THREE.BoxGeometry( 3, 3, 3),
       new THREE.MeshBasicMaterial( { depthWrite: false, transparent: false, opacity: 1, color: 0x0033ff } )
+      // helperMaterial.clone(),
     );
     this.scene.add(this.boundry);
     this.scene.add(this.cubes);
-    this.cubes.add(this.layerGroup);
+    this.scene.add(this.layerGroup);
   }
 
   private createCube() {
     this.createHelper();
 
     const pieceSize = 1;
+    // const colors = ['#003092', '#E07A5F', '#D91656', '#E52020', '#F5F5F5', '#000000'];
+
     
     const geometry = new THREE.BoxGeometry( pieceSize, pieceSize, pieceSize ); // width, height, depth
     const material = new THREE.MeshBasicMaterial( {color: 0x000000} ); 
@@ -263,7 +266,10 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
 
       piece.add(pieceCube);
       piece.name = index;
-
+      // pieceCube.material.setPosition(position.posions);
+      // pieceCube.position.set(position.x, position.y, position.z);
+      // pieceCube.position.set(0, 0, position.z);
+      // piece.position.set(0, 0, position.z);
       piece.position.set(position.x, position.y, position.z);
       const edgeGeometry:THREE.ExtrudeGeometry = this.depthedPlaneGeometry(
         pieceSize,
@@ -339,22 +345,26 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
     if ( this.state !== STILL) return;
 
     // Raycaster 를 이용하여 현재 마우스 좌표값을 plane내의 좌표값으로 변경
-   
+    const planeIntersect = this.getIntersect( position.current, this.plane, false);
+    if(!planeIntersect) return;
 
     const boundryIntersect: any = this.getIntersect( position.current, this.boundry, false );
     if(boundryIntersect) {
       this.flipType = 'layer';
       this.dragIntersect = this.getIntersect( position.current, this.cubes.children, true );
       this.dragNormal = boundryIntersect.face.normal.round();
-
+      
       this.plane.rotation.set( 0, 0, 0 );
       this.plane.position.set( 0, 0, 0 );
       this.plane.lookAt( this.dragNormal );
-      
-      this.plane.applyMatrix4( this.boundry.matrixWorld );
-
       this.plane.updateMatrixWorld();
+      // this.plane.quaternion.set(0, 0, 0, 0)
+          // this.boundry.updateMatrixWorld();
+      console.log('this.dragNormal:', this.dragNormal );
+      console.log('this.plane', this.deepcopy(this.plane))
       
+      // this.plane.updateMatrixWorld();
+      return;
     } else {
       this.flipType = 'cube';
 
@@ -363,23 +373,20 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
       this.plane.rotation.set( 0, Math.PI/4, 0 ); // Math.PI  = 3.14 radian = 180도
     }
 
-    const planeIntersect: any = this.getIntersect( position.current, this.plane, false);
-    if(!planeIntersect){
-      console.error('planeIntersect not exist');
-      return;
-    }
     this.plane.updateMatrixWorld();
     // 월드좌표값을 this.plane내의 좌표 값으로 변경
     // // 변경된 다시한번 더 구한다. planeIntersect를 구한다. 
+    // const planeIntersect1: any = this.getIntersect( position.current, this.plane, false);
     this.dragCurrent = this.plane.worldToLocal( planeIntersect.point );
     
     // 이동거리 초기화
     this.dragTotal = new THREE.Vector3();
+
+    // this.state = ( this.state === STILL ) ? PREPARING : this.state;
     this.state = PREPARING;
   }
 
   private onDragMove(position: any){
-
     const planeIntersect = this.getIntersect( position.current, this.plane, false);
     
     if(!planeIntersect) {
@@ -389,7 +396,6 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
     const point = this.plane.worldToLocal( planeIntersect.point.clone() );
     
     this.dragDelta = point.clone().sub( this.dragCurrent ).setZ( 0 );
-    
     this.dragTotal.add( this.dragDelta );
     this.dragCurrent = point;
     this.addMomentumPoint( this.dragDelta );
@@ -397,34 +403,36 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
     
     if ( this.state === PREPARING  && this.dragTotal.length() > 0.1 ) { //
       this.dragDirection = this.getMainAxis( this.dragTotal );
-   
+      
       switch(this.flipType) {
         case 'layer':
-          // return;
           const direction:any = new THREE.Vector3();
           
           direction[ this.dragDirection ] = 1;
 
-          
           const worldDirection = this.plane.localToWorld( direction ).sub( this.plane.position );
+
           const objectDirection = this.boundry.worldToLocal( worldDirection ).round();        
           this.flipAxis = objectDirection.cross( this.dragNormal ).negate();
-
+          console.log('this.flipAxis >> ', this.flipAxis);
           this.selectLayer( this.getLayer( false ) );
+          this.state = ROTATING;
           break;
         case 'cube':
           const axis = ( this.dragDirection != 'x' )
           ? ( ( this.dragDirection == 'y' && position.current.x > this.sceneWidth / 2 ) ? 'z' : 'x' )
           : 'y';
+    
           this.flipAxis = new THREE.Vector3();
-          this.flipAxis[ axis ] = 1 * ( ( axis == 'x' ) ? - 1 : 1 );      
+          this.flipAxis[ axis ] = 1 * ( ( axis == 'x' ) ? - 1 : 1 );
+    
+          this.flipAngle = 0;
+          this.state = ROTATING;
           break;
       }
-      this.flipAngle = 0;
-      this.state = ROTATING;
      
     } else if ( this.state === ROTATING ) {
-      const rotation = this.dragDelta[ this.dragDirection ] * 0.2; // 이전 및 현재의 dragDelta 값을 구한다.
+      const rotation = this.dragDelta[ this.dragDirection ]; // 이전 및 현재의 dragDelta 값을 구한다.
       switch(this.flipType) {
         case 'layer':
           this.layerGroup.rotateOnAxis( this.flipAxis, rotation );
@@ -433,6 +441,8 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
         case 'cube':
           this.boundry.rotateOnWorldAxis( this.flipAxis, rotation ); //eges 및 cubes의 로테이션을 반영한다.
           this.cubes.rotation.copy( this.boundry.rotation );
+
+          this.cubes.rotateOnWorldAxis( this.flipAxis, rotation );
           this.flipAngle += rotation; // 전체 rotaion의 값을 입력
           break;
       }
@@ -446,6 +456,7 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
   }
 
   private onDragEnd(position: any) {
+    console.log('onDragEnd this.state:', this.state);
     // state가 ROTATING 아니면 끝내고
     if ( this.state !== ROTATING ) {
       this.state = STILL;
@@ -468,18 +479,29 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
       : this.roundAngle( this.flipAngle );
 
     const delta = angle - this.flipAngle;
-    // const axis = ( this.dragDirection != 'x' )
-    // ? ( ( this.dragDirection == 'y' && position.current.x > this.sceneWidth / 2 ) ? 'z' : 'x' )
-    // : 'y';
+    const axis = ( this.dragDirection != 'x' )
+    ? ( ( this.dragDirection == 'y' && position.current.x > this.sceneWidth / 2 ) ? 'z' : 'x' )
+    : 'y';
 
     switch(this.flipType) {
       case 'layer':
         this.rotateLayer( delta, false, (layer: any) => {
+
+          // this.game.storage.saveGame();
+          
+          // this.state = this.gettingDrag ? PREPARING : STILL;
+          // this.gettingDrag = false;
+
+          // this.checkIsSolved();
           this.state = STILL;
+
         } );
         break;
       case 'cube':
-        this.rotateCube( delta,  () => {
+        this.rotateCube( delta, axis, () => {
+          // console.log('=================================');
+          // this.boundry.quaternion.set(0, 0, 0, 1)
+          // this.boundry.updateMatrixWorld();
           this.state = STILL;
         });
         break;
@@ -525,7 +547,7 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
 
   }
 
-  private rotateCube( rotation: number, callback:() => void) {
+  private rotateCube( rotation: number, axis: string, callback:() => void) {
     this.tween = {
       prerotate: 0,
       rotate: 0,
@@ -545,7 +567,13 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
       },
       onComplete: () => {
         // 값을 보정한다.
+        // this.boundry.quaternion.set(0, 0, 0, 1)   
+        // [원본] this.edges.rotation.setFromVector3( this.snapRotation( this.edges.rotation.toVector3() ) ); 
+        console.log('this.boundry.rotation 1:', this.deepcopy(this.boundry.rotation));
         this.boundry.rotation.setFromVector3( this.snapRotation( new THREE.Vector3().setFromEuler(this.boundry.rotation) ) ); 
+        
+        // this.boundry.rotation.setFromVector3( this.snapRotation( this.boundry.rotation ) );  
+        console.log('this.boundry.rotation 2:', this.deepcopy(this.boundry.rotation));
         this.cubes.rotation.copy( this.boundry.rotation );
         callback();
       },
@@ -636,7 +664,7 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
     const layer:string[] = [];
 
     let axis;
-
+    console.log('getLayer>> position >>', position);
     if ( position === false ) {
       const piece = this.dragIntersect.object.parent;
       axis = this.getMainAxis( this.flipAxis );
@@ -645,6 +673,8 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
       axis = this.getMainAxis( position );
     }
 
+    // this.game.cube.pieces.forEach( (piece: any) => {
+    console.log('getLayer>> axis >>', axis);
     this.piecesObject.forEach( (piece: any) => {
       const piecePosition = piece.position.clone().multiplyScalar( scalar ).round();
       if ( piecePosition[ axis ] == position[ axis ] ) layer.push( piece.name );

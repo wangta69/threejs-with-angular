@@ -1,9 +1,12 @@
 .layout {
   display: flex;
 
-  .switch-absolute {
-    &.on{
+  .lnb {
       position: absolute;
-    }
+  }
+
+  .content {
+    width: 100vw;
+    height: 100vh;
   }
 }

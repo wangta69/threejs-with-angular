@@ -9,8 +9,12 @@ import { BufferRingGeometryComponent } from './geometries/buffer_ring';
 import { AmbientLightComponent } from './lights/ambient.light';
 import { TextureLoaderComponent } from './loaders/texture';
 import { CameraBasicComponent } from './camera/basic';
+// import { CubeComponent } from './example/cube/cube-rotate';
 import { CubeComponent } from './example/cube/cube3_3_event_each';
+import { CubeRotateComponent} from './example/cube/cube-rotate';
 import { DraggableComponent } from './event/draggable';
+import { ShadowComponent } from './example/shadow/shadow';
+
 export const routes: Routes = [
   { path: 'basic', component: BasicThreeJsComponent },
   { path: 'grid-helper', component: GridHelperComponent },
@@ -24,6 +28,9 @@ export const routes: Routes = [
 
   { path: 'camera/basic', component: CameraBasicComponent },
   { path: 'example/cube', component: CubeComponent },
+  { path: 'example/cube-rotation', component: CubeRotateComponent },
+  
   { path: 'event/draggable', component: DraggableComponent },
-
+  { path: 'example/shadow', component: ShadowComponent },
+  
 ];
