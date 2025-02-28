@@ -154,7 +154,8 @@ export class CubeRotateComponent implements OnInit, OnDestroy, AfterViewInit { /
 		}
 
 		const colorAttribute = new THREE.Float32BufferAttribute(colors, 3);
-			boxGeometry.setAttribute('color', colorAttribute);
+		// const colorAttribute = new THREE.Uint8ClampedBufferAttribute(colors, 3);
+		boxGeometry.setAttribute('color', colorAttribute);
 
 		var cubeMaterial = new THREE.MeshBasicMaterial(
 			{

@@ -2,7 +2,7 @@ import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef } fr
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
-import OrbitControls from '../controller/orbit.controls';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 @Component({
 selector: 'app-root',

@@ -1,6 +1,6 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core'; // ViewEncapsulation,
 import * as THREE from 'three';
-// import OrbitControls from './orbit.controls';
+// import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 // import { PlanetsInfo, SunPlanets } from './interface';
 // import { GameAnimations } from './animations';
 
