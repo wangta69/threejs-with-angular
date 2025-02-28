@@ -112,13 +112,6 @@ export class OrbitControlsComponent implements OnInit, OnDestroy, AfterViewInit 
 
   private setOrbitController() {
     this.controls = new OrbitControls( this.camera, this.renderer.domElement );
-    this.controls.enableDamping = true; // enableDamping이 true일 경우 에니메이션 루프에서 .update()를 호출해야만 감쇠 관성를 사용할 수 있습니다.Default is 0.05.
-    this.controls.dampingFactor = 0.05; // enableDamping이 true
-    this.controls.minDistance = 1;
-    this.controls.maxDistance = Infinity;
-    this.controls.maxPolarAngle = Math.PI / 2; //
-    this.controls.zoomSpeed = 0.5;
-
 
     const gui = new GUI()
     const physicsFolder = gui.addFolder('OrbitControls')
@@ -138,6 +131,7 @@ export class OrbitControlsComponent implements OnInit, OnDestroy, AfterViewInit 
 
   private render() {
     this.stats.update();
+    this.controls.update(); // autoRotate 활성화 하거나 enableDamping=true 일 경우 이 부분이 반드시 필요
     this.renderer.render( this.scene, this.camera );
   }
 
