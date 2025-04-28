@@ -128,6 +128,25 @@ export class GlbLoaderComponent implements OnInit, OnDestroy, AfterViewInit { //
     });
   }
 
+  private glbloader2(props: any) {
+
+    return new Promise((resolve, reject) => {
+      const loader = new GLTFLoader();
+  
+      // const { nodes, materials } = useGLTF("./models/star.glb");
+  
+      loader.load('/assets/star.glb',  ( glb ) => {
+        // this.myModel = glb.scene.children[0];
+        const myModel = glb.scene; 
+        resolve(myModel);
+      }, ( xhr ) => {// called while loading is progressing
+        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+      }, ( error ) => {// called when loading has errors
+        console.log( 'An error happened' );
+      });
+    })
+  }
+
   private onDocumentMouseMove(event: any) {
     this.mouseX = (event.clientX - this.windowHalfX)
     this.mouseY = (event.clientY - this.windowHalfY)

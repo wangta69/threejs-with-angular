@@ -48,9 +48,6 @@ export class CubeComponent implements OnInit, OnDestroy, AfterViewInit { // , Af
     rotate: 0,
     delta: 0,
     origin_rotate: 0
-    // x: 0,
-    // y: 0,
-    // z: 0
   };
 
   private delta = 0;

@@ -97,9 +97,19 @@ export class RapierSample1Component implements OnInit, OnDestroy, AfterViewInit 
     this.cubeMesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshNormalMaterial());
     this.cubeMesh.castShadow = true;
     this.scene.add(this.cubeMesh);
+    
+    // mass 가 0 일경우 떨어지지 않는다.
+    // restitution 이 없을 경우 리바운드 하지 않는다.
+    const cubeCollider = RAPIER.ColliderDesc.cuboid(0.5, 0.5, 0.5).setMass(1).setRestitution(1.1);
+    //const cubeCollider = RAPIER.ColliderDesc.cuboid(0.5, 0.5, 0.5).setMass(1);
     const cubeBody = this.world.createRigidBody(RAPIER.RigidBodyDesc.dynamic().setTranslation(0, 5, 0).setCanSleep(false));
-    const cubeShape = RAPIER.ColliderDesc.cuboid(0.5, 0.5, 0.5).setMass(1).setRestitution(1.1);
-    this.world.createCollider(cubeShape, cubeBody);
+   
+    this.world.createCollider(cubeCollider, cubeBody);
+    
+    
+    console.log('cubeCollider:', cubeCollider);
+    console.log('cubeBody:', cubeBody);
+
     this.dynamicBodies.push([this.cubeMesh, cubeBody]);
   }
 
@@ -108,9 +118,15 @@ export class RapierSample1Component implements OnInit, OnDestroy, AfterViewInit 
     floorMesh.receiveShadow = true;
     floorMesh.position.y = -1;
     this.scene.add(floorMesh);
+
+    const floorCollider = RAPIER.ColliderDesc.cuboid(50, 0.5, 50);
+    // const floorBody = this.world.createRigidBody(RAPIER.RigidBodyDesc.fixed().setTranslation(0, -1, 0));
     const floorBody = this.world.createRigidBody(RAPIER.RigidBodyDesc.fixed().setTranslation(0, -1, 0));
-    const floorShape = RAPIER.ColliderDesc.cuboid(50, 0.5, 50);
-    this.world.createCollider(floorShape, floorBody);
+    
+    
+    console.log('floorBody:', floorBody);
+    console.log('floorShape:', floorCollider);
+    this.world.createCollider(floorCollider, floorBody);
   }
 
 
