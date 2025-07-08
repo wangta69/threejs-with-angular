@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { BasicThreeJsComponent } from './basic/scene';
 import { GridHelperComponent } from './basic/grid_helper';
 import { OrbitControlsComponent } from './controller/orbitcontrol';
+import { PlaneGeometryComponent } from './geometries/plane';
 import { SphereGeometryComponent } from './geometries/sphere';
 import { BufferSquareGeometryComponent } from './geometries/buffer_square';
 import { BufferRingGeometryComponent } from './geometries/buffer_ring';
@@ -22,6 +23,7 @@ export const routes: Routes = [
   { path: 'basic', component: BasicThreeJsComponent },
   { path: 'grid-helper', component: GridHelperComponent },
   { path: 'controls/orbitControls', component: OrbitControlsComponent },
+  { path: 'geometries/plane', component: PlaneGeometryComponent },
   { path: 'geometries/sphere', component: SphereGeometryComponent },
   { path: 'geometries/buffer-square', component: BufferSquareGeometryComponent },
   { path: 'geometries/buffer-ring', component: BufferRingGeometryComponent },

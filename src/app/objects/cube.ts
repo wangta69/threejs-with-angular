@@ -32,8 +32,4 @@ export default class Cube {
 
     return new THREE.Mesh( geometry, material );
   }
-
-  
-
-
 }
